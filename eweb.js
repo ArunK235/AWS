@@ -68,3 +68,28 @@ parentContainer.addEventListener('click',(e)=>{
     }
 })
 
+window.addEventListener('DOMContentLoaded',()=>{
+    axios.get('http://localhost:4000/products').then((data)=>{
+        console.log(data);
+        if(data.request.status===200){
+            const products= data.data.products;
+            const parentSection= document.getElementById('music');
+            products.forEach(product =>{
+                const productHtml=
+                `<div>
+                    <h1>${product.title}</h1>
+                    <img src=${product.imageUrl}></img>
+                    <button id="style">Add to Cart</button>
+                    
+
+                </div>`
+                parentSection.innerHTML=parentSection.innerHTML+productHtml
+                document.getElementById('style').style.color = 'tomato';
+                
+            })
+        }
+        
+        
+        
+    })
+})
