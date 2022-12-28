@@ -1,19 +1,46 @@
 const Product = require('../models/product');
 const Cart = require('../models/cart');
+const CartItem= require('../models/cart-item');
+const Items_Per_Page=2;
 
 exports.getProducts = (req, res, next) => {
+  const page= +req.query.page || 1;
+  let totalItems;
   Product.findAll()
-    .then(products => {
-      res.json({products, success : true});
+  .then((total)=>{
+    //console.log(total);
+    totalItems=total.length;
+    return Product.findAll({
+      offset:((page - 1) * Items_Per_Page),
+      limit: Items_Per_Page,
+    })
+  })
+  
+  .then(products => {
+    
+    
+    res.json({
+      products: products,
+      
+      currentPage: page,
+      hasNextPage: Items_Per_Page * page < totalItems,
+      nextPage: page + 1,
+      hasPreviousPage: page > 1,
+      previousPage: page - 1,
+      lastPage: Math.ceil(totalItems / Items_Per_Page),
+    });
+      
+    //res.json({products, success : true});
       /*res.render('shop/product-list', {
         prods: products,
         pageTitle: 'All Products',
         path: '/products'
       });*/
-    })
-    .catch(err => {
-      console.log(err);
-    });
+    
+  })
+  .catch(err => {
+    console.log(err);
+  });
 };
 
 exports.getProduct = (req, res, next) => {
@@ -39,17 +66,35 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
+  const page= +req.query.page || 1;
+  let totalItems;
   Product.findAll()
-    .then(products => {
-      res.render('shop/index', {
-        prods: products,
-        pageTitle: 'Shop',
-        path: '/'
-      });
+  .then((total)=>{
+
+    totalItems=total.length;
+    return Product.findAll({
+      offset:((page - 1) * Items_Per_Page),
+      limit: Items_Per_Page,
     })
-    .catch(err => {
-      console.log(err);
+  })
+  
+  .then(products => {
+    
+    
+    res.json({
+      cartItem: products,
+      
+      currentPage: page,
+      hasNextPage: Items_Per_Page * page < totalItems,
+      nextPage: page + 1,
+      hasPreviousPage: page > 1,
+      previousPage: page - 1,
+      lastPage: Math.ceil(totalItems / Items_Per_Page),
     });
+  })
+  .catch(err => {
+    console.log(err);
+  });
 };
 
 exports.getCart = (req, res, next) => {
